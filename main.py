@@ -46,7 +46,7 @@ def predict(im):
 
     probabilities = torch.nn.functional.softmax(out[0], dim=0)
 
-    values, indices = torch.topk(probabilities, 5)
+    values, indices = torch.topk(probabilities, 10)
 
     return {LABELS[i]: v.item() for i, v in zip(indices, values)}
 
@@ -235,7 +235,7 @@ def recognise_image(data):
             # Check if the element is "on" (equal to zero)
             if resized_data[i][j] != 0:
                 # Convert the "on" value to 255
-                resized_data[i][j] += 255
+                resized_data[i][j] = 190
 
     print(resized_data)
 
