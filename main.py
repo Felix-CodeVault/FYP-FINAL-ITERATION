@@ -2,16 +2,53 @@ import time, random, requests
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from flask_socketio import join_room, leave_room, send, emit, SocketIO
 from string import ascii_uppercase
-from static import model as model
 import numpy as np
 import torch
 from torch import nn
+from PIL import Image
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "sdasd"
 socketio = SocketIO(app)
 
 rooms = {}
+
+class_names_path = "static/class_names.txt"
+torch_model_path = "static/pytorch_model.bin"
+
+LABELS = open(class_names_path).read().splitlines()
+
+model = nn.Sequential(
+    nn.Conv2d(1, 32, 3, padding='same'),
+    nn.ReLU(),
+    nn.MaxPool2d(2),
+    nn.Conv2d(32, 64, 3, padding='same'),
+    nn.ReLU(),
+    nn.MaxPool2d(2),
+    nn.Conv2d(64, 128, 3, padding='same'),
+    nn.ReLU(),
+    nn.MaxPool2d(2),
+    nn.Flatten(),
+    nn.Linear(1152, 256),
+    nn.ReLU(),
+    nn.Linear(256, len(LABELS)),
+)
+state_dict = torch.load(torch_model_path, map_location='cpu')
+model.load_state_dict(state_dict, strict=False)
+model.eval()
+
+
+def predict(im):
+    x = torch.tensor(im, dtype=torch.float32).unsqueeze(0).unsqueeze(0) / 255.
+
+    with torch.no_grad():
+        out = model(x)
+
+    probabilities = torch.nn.functional.softmax(out[0], dim=0)
+
+    values, indices = torch.topk(probabilities, 5)
+
+    return {LABELS[i]: v.item() for i, v in zip(indices, values)}
 
 
 def generate_unique_code(length):
@@ -180,48 +217,30 @@ def handle_guess_player2(canvas_data_array2):
 
 
 def recognise_image(data):
-    x = np.array(data)
-    print(model.predict(x))
+    flat_data = [pixel for row in data for pixel in row]  # convert to a flat list
+    flat_data = np.array(flat_data, dtype=np.uint8)  # convert to numpy array of uint8 type
 
+    # create a PIL image object from the numpy array
+    img = Image.fromarray(flat_data.reshape(400, 400), mode='L')
 
-def predict(im):
-    x = torch.tensor(im, dtype=torch.float32).unsqueeze(0).unsqueeze(0) / 255.
+    # resize the image to 28x28 using Lanczos filter
+    img_resized = img.resize((28, 28), resample=Image.LANCZOS)
 
-    with torch.no_grad():
-        out = model(x)
+    # convert the resized image back to a numpy array
+    resized_data = np.array(img_resized.getdata(), dtype=np.uint8).reshape(28, 28)
 
-    probabilities = torch.nn.functional.softmax(out[0], dim=0)
+    # Loop through each element in the 2D array
+    for i in range(len(resized_data)):
+        for j in range(len(resized_data[i])):
+            # Check if the element is "on" (equal to zero)
+            if resized_data[i][j] != 0:
+                # Convert the "on" value to 255
+                resized_data[i][j] += 255
 
-    values, indices = torch.topk(probabilities, 5)
+    print(resized_data)
 
-    return {LABELS[i]: v.item() for i, v in zip(indices, values)}
+    print(predict(resized_data))
 
 
 if __name__ == "__main__":
     socketio.run(app, debug=True, allow_unsafe_werkzeug=True)
-
-    class_names_path = "static/class_names.txt"
-    torch_model_path = "static/pytorch_model.bin"
-
-    global LABELS
-    LABELS = open(class_names_path).read().splitlines()
-
-    global model
-    model = nn.Sequential(
-        nn.Conv2d(1, 32, 3, padding='same'),
-        nn.ReLU(),
-        nn.MaxPool2d(2),
-        nn.Conv2d(32, 64, 3, padding='same'),
-        nn.ReLU(),
-        nn.MaxPool2d(2),
-        nn.Conv2d(64, 128, 3, padding='same'),
-        nn.ReLU(),
-        nn.MaxPool2d(2),
-        nn.Flatten(),
-        nn.Linear(1152, 256),
-        nn.ReLU(),
-        nn.Linear(256, len(LABELS)),
-    )
-    state_dict = torch.load(torch_model_path, map_location='cpu')
-    model.load_state_dict(state_dict, strict=False)
-    model.eval()

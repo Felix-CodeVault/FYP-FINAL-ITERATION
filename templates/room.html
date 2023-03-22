@@ -98,17 +98,17 @@
             isDrawing = false;
             var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             var grayscaleArray = []
-            var temp_val;
+            var innerArray = []
 
             for (let i = 0; i < imageData.data.length; i += 4) {
                 // visibility of pixel
                 const pixel_alpha_value = imageData.data[i + 3];
-                if (pixel_alpha_value > 0) {
-                    temp_val = 255
-                } else {
-                    temp_val = 0
+                innerArray.push(pixel_alpha_value)
+
+                if (innerArray.length === 400) {
+                    grayscaleArray.push(innerArray);
+                    innerArray = []
                 }
-                grayscaleArray.push(temp_val)
 
             }
             socketio.emit("canvas_data_array", grayscaleArray)
@@ -151,17 +151,17 @@
 
             var imageData = ctx_player_2.getImageData(0, 0, canvas_player_2.width, canvas_player_2.height);
             var grayscaleArray2 = []
-            var temp_val;
+            var innerArray2 = []
 
             for (let i = 0; i < imageData.data.length; i += 4) {
                 // visibility of pixel
                 const pixel_alpha_value = imageData.data[i + 3];
-                if (pixel_alpha_value > 0) {
-                    temp_val = 255
-                } else {
-                    temp_val = 0
+                innerArray2.push(pixel_alpha_value)
+
+                if (innerArray2.length === 400) {
+                    grayscaleArray2.push(innerArray2);
+                    innerArray2 = []
                 }
-                grayscaleArray2.push(temp_val)
 
             }
             socketio.emit("canvas_data_array_player_2", grayscaleArray2)
