@@ -95,7 +95,7 @@ h2 {
     color: darkgray;
 }
 
-.canvas{
+.canvas {
     border: black;
     background-color: white;
 }
@@ -109,3 +109,35 @@ h2 {
 .column {
     float: left;
 }
+
+.wordToDraw {
+    background-color: white;
+    font-size: 35px;
+    text-align: center;
+}
+
+.points-section {
+    background-color: white;
+    font-size: 25px;
+    padding: 5px;
+    text-align: center;
+    border: black 3px;
+}
+
+.guess-word {
+    background-color: white;
+    font-size: 20px;
+    padding: 5px;
+    text-align: center;
+    border: black 3px;
+
+}
+
+.timer-box {
+    background-color: white;
+    font-size: 30px;
+    text-align: center;
+    padding: 10px;
+    align-content: center;
+}
+

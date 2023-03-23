@@ -6,6 +6,7 @@ import numpy as np
 import torch
 from torch import nn
 from PIL import Image
+import cv2
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "sdasd"
@@ -208,7 +209,8 @@ def handle_canvas_data_player_2(data):
 
 @socketio.on("canvas_data_array")
 def handle_guess(canvas_data_array):
-    recognise_image(canvas_data_array)
+    guess1 = recognise_image(canvas_data_array)
+    emit("guess-player-1", )
 
 
 @socketio.on("canvas_data_array_player_2")
@@ -229,17 +231,19 @@ def recognise_image(data):
     # convert the resized image back to a numpy array
     resized_data = np.array(img_resized.getdata(), dtype=np.uint8).reshape(28, 28)
 
-    # Loop through each element in the 2D array
-    for i in range(len(resized_data)):
-        for j in range(len(resized_data[i])):
-            # Check if the element is "on" (equal to zero)
-            if resized_data[i][j] != 0:
-                # Convert the "on" value to 255
-                resized_data[i][j] = 190
+    # # Loop through each element in the 2D array
+    # for i in range(len(resized_data)):
+    #     for j in range(len(resized_data[i])):
+    #         # Check if the element is "on" (equal to zero)
+    #         if resized_data[i][j] != 0:
+    #             # Convert the "on" value to 255
+    #             resized_data[i][j] = 255
 
-    print(resized_data)
+    # print(resized_data)
 
-    print(predict(resized_data))
+    guess = predict(resized_data)
+    print(guess)
+    return guess
 
 
 if __name__ == "__main__":
