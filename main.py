@@ -6,8 +6,7 @@ import numpy as np
 import torch
 from torch import nn
 from PIL import Image
-import cv2
-
+import re
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "sdasd"
 socketio = SocketIO(app)
@@ -210,12 +209,13 @@ def handle_canvas_data_player_2(data):
 @socketio.on("canvas_data_array")
 def handle_guess(canvas_data_array):
     guess1 = recognise_image(canvas_data_array)
-    emit("guess-player-1", )
+    emit("guess-player-1", guess1[0])
 
 
 @socketio.on("canvas_data_array_player_2")
 def handle_guess_player2(canvas_data_array2):
-    recognise_image(canvas_data_array2)
+    guess2 = recognise_image(canvas_data_array2)
+    emit("guess-player-2", guess2[0])
 
 
 def recognise_image(data):
@@ -242,8 +242,9 @@ def recognise_image(data):
     # print(resized_data)
 
     guess = predict(resized_data)
-    print(guess)
-    return guess
+    output = list(guess.keys())
+    print(output)
+    return output
 
 
 if __name__ == "__main__":
