@@ -7,6 +7,7 @@ import torch
 from torch import nn
 from PIL import Image
 import re
+
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "sdasd"
 socketio = SocketIO(app)
@@ -125,9 +126,8 @@ def prep_zone():
             if rooms[room]["members"] == 1:
                 return redirect(url_for("room"))
             else:
-                return redirect(url_for("room"))
-                # return render_template("prep_zone.html", code=room, error="Second Player Needed",
-                #                      messages=rooms[room]["messages"])
+                return render_template("prep_zone.html", code=room, error="Second Player Needed",
+                                       messages=rooms[room]["messages"])
     return render_template("prep_zone.html", code=room, messages=rooms[room]["messages"])
 
 
@@ -138,6 +138,12 @@ def room():
     if rooms[room]["members"] == 2:
         return render_template("room.html", messages=rooms[room]["messages"])
     return render_template("room.html", messages=rooms[room]["messages"])
+
+
+@app.route("/winner_screen")
+def winner_screen():
+    winner = request.args.get("winnerValue")
+    return render_template("winnerScreen.html", winner=winner)
 
 
 @socketio.on("message")
@@ -217,6 +223,9 @@ def handle_guess_player2(canvas_data_array2):
     guess2 = recognise_image(canvas_data_array2)
     emit("guess-player-2", guess2[0])
 
+@socketio.on("all_data")
+def handle_all_data(data):
+    socketio.emit("data", data)
 
 def recognise_image(data):
     flat_data = [pixel for row in data for pixel in row]  # convert to a flat list

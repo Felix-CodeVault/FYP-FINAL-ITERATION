@@ -4,7 +4,6 @@
 
     <div class="row">
         <div class="wordToDraw" id="wordToDraw">BLANK</div>
-
         <br>
 
         <div class="column">
@@ -213,8 +212,10 @@
         var currentWord;
         var timer;
         var timeRemaining;
-        var words = ["airplane", "alarm_clock", "anvil", "apple", "axe", "baseball", "baseball_bat", "basketball", "beard", "bed", "bench", "bicycle", "bird", "book", "bread", "bridge", "broom", "butterfly", "camera", "candle", "car", "cat", "ceiling_fan", "cell_phone", "chair", "circle", "clock", "cloud", "coffee_cup", "cookie", "cup", "diving_board", "donut", "door", "drums", "dumbbell", "envelope", "eye", "eyeglasses", "face", "fan", "flower", "frying_pan", "grapes", "hammer", "hat", "headphones", "helmet", "hot_dog", "ice_cream", "key", "knife", "ladder", "laptop", "light_bulb", "lightning", "lollipop", "microphone", "moon", "mountain", "moustache", "mushroom", "pants", "paper_clip", "pencil", "pillow", "pizza", "power_outlet", "radio", "rainbow", "rifle", "saw", "scissors", "screwdriver", "shorts", "shovel", "smiley_face", "snake", "sock", "spider", "spoon", "square", "star", "stop_sign", "suitcase", "sun", "sword", "syringe", "t-shirt", "table", "tennis_racquet", "tent", "tooth", "traffic_light", "tree", "triangle", "umbrella", "wheel", "wristwatch"]
+        var words = ["airplane", "alarm_clock", "anvil", "apple", "axe", "baseball", "baseball_bat", "basketball", "bed", "bench", "bicycle", "bird", "book", "bread", "bridge", "broom", "butterfly", "camera", "candle", "car", "cat", "cell_phone", "chair", "circle", "clock", "cloud", "cookie", "cup", "diving_board", "donut", "door", "drums", "dumbbell", "envelope", "eye", "eyeglasses", "face", "flower", "frying_pan", "grapes", "hammer", "hat", "headphones", "helmet", "hot_dog", "ice_cream", "key", "knife", "ladder", "laptop", "light_bulb", "lightning", "lollipop", "microphone", "moon", "mountain", "moustache", "mushroom", "pants", "paper_clip", "pencil", "pillow", "pizza", "power_outlet", "radio", "rainbow", "rifle", "saw", "scissors", "screwdriver", "shorts", "shovel", "smiley_face", "snake", "sock", "spider", "spoon", "square", "star", "stop_sign", "suitcase", "sun", "sword", "syringe", "t-shirt", "table", "tennis_racquet", "tent", "tooth", "traffic_light", "tree", "triangle", "umbrella", "wheel", "wristwatch"]
         var timeLimit = 60;
+        var roundNum = 0;
+        var amountOfRounds = 0;
 
         var scorePlayer1 = 0;
         var guessPlayer1 = "Guessing...";
@@ -248,10 +249,10 @@
             console.log(currentWord)
 
             // display word to players
-            document.getElementById("wordToDraw").innerHTML = currentWord.charAt(0).toUpperCase() + currentWord.slice(1);
+            document.getElementById("wordToDraw").innerHTML = (currentWord.charAt(0).toUpperCase() + currentWord.slice(1)).replace(/_/g, " ");
             document.getElementById("timer-box").innerHTML = timeLimit;
-            document.getElementById("guess-word-1").innerHTML = guessPlayer1
-            document.getElementById("guess-word-2").innerHTML = guessPlayer2
+            document.getElementById("guess-word-1").innerHTML = "Guessing..."
+            document.getElementById("guess-word-2").innerHTML = "Guessing..."
             document.getElementById("score-player-1").innerHTML = scorePlayer1
             document.getElementById("score-player-2").innerHTML = scorePlayer2
 
@@ -260,24 +261,43 @@
         }
 
         function nextRound() {
+            // declare winner after certain rounds
+            if (roundNum >= amountOfRounds) {
+                //cancel timer
+                clearInterval(timer);
+                // get the winner
+                let winner;
+                if (scorePlayer1 > scorePlayer2) {
+                    winner = "player1"
+                } else if (scorePlayer2 > scorePlayer1) {
+                    winner = "player2"
+                }
+
+                // redirect to
+                window.location.href = "http://localhost:5000/winner_screen?winnerValue=" + encodeURI(winner)
+
+            }
+
             // rest guess correct
             guess1_Once = false;
             guess2_Once = false;
             //cancel timer
             clearInterval(timer);
             //clears canvases
+
             setTimeout(function () {
                 clearCanvas(3)
                 // select new word
                 currentWord = words[Math.floor(Math.random() * words.length)];
-                document.getElementById("wordToDraw").innerHTML = currentWord.charAt(0).toUpperCase() + currentWord.slice(1);
+                document.getElementById("wordToDraw").innerHTML = (currentWord.charAt(0).toUpperCase() + currentWord.slice(1)).replace(/_/g, " ");
                 // reset timer
                 document.getElementById("timer-box").innerHTML = timeLimit;
                 timeRemaining = timeLimit;
                 // reset guesses
                 document.getElementById("guess-word-1").innerHTML = "Guessing..."
                 document.getElementById("guess-word-2").innerHTML = "Guessing..."
-            }, (3 * 1000))
+                roundNum++;
+            }, (3 * 1000));
 
 
             //starts game logic again after 3 seconds

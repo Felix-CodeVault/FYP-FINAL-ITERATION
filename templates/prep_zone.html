@@ -3,7 +3,7 @@
     <form method="post">
         <div class="white-container">
             <h2>{{ code }}</h2>
-            <button name="play-btn" id="play-btn">Play</button>
+            <button name="play-btn" id="play-btn" type="button" onclick="sendToGame()">Play</button>
             <br>
             {% if error %}
                 <ul>
@@ -73,6 +73,12 @@
             var element = document.getElementById("messages");
             var box = document.getElementById("message")
             element.scrollTop = element.scrollHeight;
+        }
+    </script>
+
+    <script type="text/javascript">
+        function sendToGame(){
+            window.location.href = "{{ url_for('room') }}"
         }
     </script>
 
