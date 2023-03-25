@@ -133,7 +133,16 @@ def prep_zone():
 
 @socketio.on("play_button_pressed")
 def handle_play_button_press():
-    emit("redirect_play", url_for("room"), broadcast=True)
+    room = session.get("room")
+    num_users = rooms[room]["members"]
+    print(num_users)
+
+    if num_users == 2:
+        emit("redirect_play", url_for("room"), broadcast=True)
+
+    if num_users == 1:
+        rooms[room]["error"] = "Second Player Needed"
+        emit("error_message", rooms[room]["error"])
 
 
 @app.route("/room")

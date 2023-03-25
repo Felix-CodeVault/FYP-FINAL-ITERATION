@@ -4,12 +4,8 @@
         <div class="white-container">
             <h2>{{ code }}</h2>
             <button name="play-btn" id="play-btn" type="button" onclick="sendToGame()">Play</button>
-            <br>
-            {% if error %}
-                <ul>
-                    <li>{{ error }}</li>
-                </ul>
-            {% endif %}
+            <p style="text-align: center" id="error"></p>
+
         </div>
 
 
@@ -83,6 +79,11 @@
         var playBtn = document.getElementById("play-btn");
         playBtn.addEventListener("click", function () {
             socketio.emit("play_button_pressed")
+        })
+
+        socketio.on("error_message", function (error) {
+            var errorElement = document.getElementById("error")
+            errorElement.textContent = error
         })
     </script>
 
