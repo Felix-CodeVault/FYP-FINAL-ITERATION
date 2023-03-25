@@ -131,6 +131,11 @@ def prep_zone():
     return render_template("prep_zone.html", code=room, messages=rooms[room]["messages"])
 
 
+@socketio.on("play_button_pressed")
+def handle_play_button_press():
+    emit("redirect_play", url_for("room"), broadcast=True)
+
+
 @app.route("/room")
 def room():
     room = session.get("room")
@@ -223,9 +228,11 @@ def handle_guess_player2(canvas_data_array2):
     guess2 = recognise_image(canvas_data_array2)
     emit("guess-player-2", guess2[0])
 
+
 @socketio.on("all_data")
 def handle_all_data(data):
     socketio.emit("data", data)
+
 
 def recognise_image(data):
     flat_data = [pixel for row in data for pixel in row]  # convert to a flat list

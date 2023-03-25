@@ -77,9 +77,13 @@
     </script>
 
     <script type="text/javascript">
-        function sendToGame(){
-            window.location.href = "{{ url_for('room') }}"
-        }
+        socketio.on("redirect_play", function (url) {
+            window.location.href = url;
+        })
+        var playBtn = document.getElementById("play-btn");
+        playBtn.addEventListener("click", function () {
+            socketio.emit("play_button_pressed")
+        })
     </script>
 
 {% endblock %}
