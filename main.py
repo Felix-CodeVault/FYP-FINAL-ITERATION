@@ -1,3 +1,4 @@
+import json
 import time, random, requests
 from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 from flask_socketio import join_room, leave_room, send, emit, SocketIO
@@ -13,6 +14,19 @@ app.config["SECRET_KEY"] = "sdasd"
 socketio = SocketIO(app)
 
 rooms = {}
+num_rounds = 5
+
+words = ["airplane", "alarm_clock", "anvil", "apple", "axe", "baseball", "baseball_bat", "basketball", "bed",
+         "bench", "bicycle", "bird", "book", "bread", "bridge", "broom", "butterfly", "camera", "candle", "car",
+         "cat", "cell_phone", "chair", "circle", "clock", "cloud", "cookie", "cup", "diving_board", "donut",
+         "door", "drums", "dumbbell", "envelope", "eye", "eyeglasses", "face", "flower", "frying_pan", "grapes",
+         "hammer", "hat", "headphones", "helmet", "hot_dog", "ice_cream", "key", "knife", "ladder", "laptop",
+         "light_bulb", "lightning", "lollipop", "microphone", "moon", "mountain", "moustache", "mushroom",
+         "pants", "paper_clip", "pencil", "pillow", "pizza", "power_outlet", "radio", "rainbow", "rifle", "saw",
+         "scissors", "screwdriver", "shorts", "shovel", "smiley_face", "snake", "sock", "spider", "spoon",
+         "square", "star", "stop_sign", "suitcase", "sun", "sword", "syringe", "t-shirt", "table",
+         "tennis_racquet", "tent", "tooth", "traffic_light", "tree", "triangle", "umbrella", "wheel",
+         "wristwatch"]
 
 class_names_path = "static/class_names.txt"
 torch_model_path = "static/pytorch_model.bin"
@@ -63,6 +77,19 @@ def generate_unique_code(length):
     return code
 
 
+def create_word_list(rounds):
+    wl = []
+    for i in range(rounds):
+        w = random.choice(words)
+        while w in wl:
+            w = random.choice(words)
+        wl.append(w)
+
+    print(wl)
+    # sets the word list for the room
+    return wl
+
+
 @app.route("/game")
 def game():
     return render_template("game_room.html")
@@ -98,8 +125,10 @@ def home():
 
         room = code
         if create != False:
+            # create the room
             room = generate_unique_code(5)
             rooms[room] = {"members": 0, "messages": []}
+            rooms[room]["word_list"] = create_word_list(num_rounds)
         elif code not in rooms:
             return render_template("home.html", error="Room doesn't exist", code=code, name=name)
 
@@ -128,7 +157,8 @@ def prep_zone():
             else:
                 return render_template("prep_zone.html", code=room, error="Second Player Needed",
                                        messages=rooms[room]["messages"])
-    return render_template("prep_zone.html", code=room, messages=rooms[room]["messages"])
+    return render_template("prep_zone.html", code=room, messages=rooms[room]["messages"],
+                           word_list=rooms[room]["word_list"])
 
 
 @socketio.on("play_button_pressed")
@@ -150,8 +180,8 @@ def room():
     room = session.get("room")
     # starting the game when both players enter the room
     if rooms[room]["members"] == 2:
-        return render_template("room.html", messages=rooms[room]["messages"])
-    return render_template("room.html", messages=rooms[room]["messages"])
+        return render_template("room.html", messages=rooms[room]["messages"], word_list=rooms[room]["word_list"])
+    return render_template("room.html", messages=rooms[room]["messages"], word_list=rooms[room]["word_list"])
 
 
 @app.route("/winner_screen")
@@ -229,18 +259,33 @@ def handle_canvas_data_player_2(data):
 @socketio.on("canvas_data_array")
 def handle_guess(canvas_data_array):
     guess1 = recognise_image(canvas_data_array)
-    emit("guess-player-1", guess1[0])
+    emit("guess-player-1", guess1[0], broadcast=True)
 
 
 @socketio.on("canvas_data_array_player_2")
 def handle_guess_player2(canvas_data_array2):
     guess2 = recognise_image(canvas_data_array2)
-    emit("guess-player-2", guess2[0])
+    emit("guess-player-2", guess2[0], broadcast=True)
 
 
 @socketio.on("all_data")
 def handle_all_data(data):
     socketio.emit("data", data)
+
+
+@socketio.on("broadcast_score1")
+def calc_score1(score1):
+    emit("score_update1", score1)
+
+
+@socketio.on("broadcast_score2")
+def calc_score2(score2):
+    emit("score_update2", score2)
+
+
+@socketio.on("got_to_winner")
+def go_to_winner(winner):
+    emit("winner_page", winner)
 
 
 def recognise_image(data):
