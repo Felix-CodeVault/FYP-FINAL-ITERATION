@@ -231,6 +231,10 @@
         var guess1_Once = false;
         var guess2_Once = false;
 
+        // sound effects
+        let correctGuessSound = new Audio("static/correct-choice.mp3")
+        let nextLevelSound = new Audio("static/new-level.mp3")
+
         // getting the guesses
         socketio.on("guess-player-1", (g1) => {
             guessPlayer1 = g1.toString();
@@ -301,6 +305,8 @@
             guess2_Once = false;
 
             setTimeout(function () {
+
+
                 // rest guess correct
                 guess1_Once = false;
                 guess2_Once = false;
@@ -319,6 +325,8 @@
 
             }, (3 * 1000));
 
+            // plays sound effect
+            nextLevelSound.play()
 
             //starts game logic again after 3 seconds
             setTimeout(function () {
@@ -346,6 +354,7 @@
             // checks players drawing
             if (guessPlayer1 === currentWord && guess1_Once === false) {
                 guess1_Once = true;
+                correctGuessSound.play()
                 // calc and award points
                 pointsPlayer1 = parseInt(timeRemaining) * 13;
                 updateScore(1, pointsPlayer1)
@@ -353,6 +362,7 @@
 
             if (guessPlayer2 === currentWord && guess2_Once === false) {
                 guess2_Once = true;
+                correctGuessSound.play()
                 // calc and award points
                 pointsPlayer2 = parseInt(timeRemaining) * 13;
                 updateScore(2, pointsPlayer2)
