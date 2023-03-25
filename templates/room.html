@@ -16,6 +16,10 @@
                 <canvas id="canvas" width="400" height="400"></canvas>
             </div>
             <br>
+            <div class="name-clear" id="name-clear">
+                <button type="button" onclick="clearCanvas1()">Clear</button>
+            </div>
+            <br>
             <div class="guess-word" id="guess-word-1"></div>
         </div>
 
@@ -47,6 +51,10 @@
             <br>
             <div class="canvas">
                 <canvas id="canvas-player-2" width="400" height="400"></canvas>
+            </div>
+            <br>
+            <div class="name-clear" id="name-clear">
+                <button type="button" onclick="clearCanvas2()">Clear</button>
             </div>
             <br>
             <div class="guess-word" id="guess-word-2"></div>
@@ -408,6 +416,27 @@
             }
         }
 
+    </script>
+
+    <script type="text/javascript">
+        // clearing canvases via sockets and button
+        socketio.on("clear1", () => {
+            clearCanvas(1)
+        })
+
+        function clearCanvas1() {
+            clearCanvas(1)
+            socketio.emit("clearCanvas1")
+        }
+
+        socketio.on("clear2", () => {
+            clearCanvas(2)
+        })
+
+        function clearCanvas2() {
+            clearCanvas(2)
+            socketio.emit("clearCanvas2")
+        }
     </script>
 
     {% for msg in messages %}

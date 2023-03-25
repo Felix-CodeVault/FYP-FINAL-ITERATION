@@ -244,16 +244,24 @@ def disconnect():
 
 @socketio.on("canvas_data")
 def handle_canvas_data(data):
-    # TODO: deals with drawing recognition
     # send data to all canvases
-    emit("canvas_data", data, broadcast=True, include_self=False)
+    emit("canvas_data", data, broadcast=True, include_self=True)
 
 
 @socketio.on("canvas_data_player_2")
 def handle_canvas_data_player_2(data):
-    # TODO: deals with drawing recognition
     # send data to all canvases
     emit("canvas_data_player_2", data, broadcast=True, include_self=False)
+
+
+@socketio.on("clearCanvas1")
+def clearC1():
+    emit("clear1", broadcast=True)
+
+
+@socketio.on("clearCanvas2")
+def clear2():
+    emit("clear2", broadcast=True)
 
 
 @socketio.on("canvas_data_array")
