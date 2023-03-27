@@ -18,6 +18,7 @@
             <br>
             <div class="name-clear" id="name-clear">
                 <button type="button" onclick="clearCanvas1()">Clear</button>
+                <p id="player1-display" style="color: crimson"></p>
             </div>
             <br>
             <div class="guess-word" id="guess-word-1"></div>
@@ -55,6 +56,7 @@
             <br>
             <div class="name-clear" id="name-clear">
                 <button type="button" onclick="clearCanvas2()">Clear</button>
+                <p id="player2-display" style="color: crimson"></p>
             </div>
             <br>
             <div class="guess-word" id="guess-word-2"></div>
@@ -217,6 +219,9 @@
     </script>
 
     <script type="text/javascript">
+        // assigning player 1 and 2
+        var p1 = localStorage.getItem("player1")
+        var p2 = localStorage.getItem("player2")
         // data for running the game
         var gameStarted = false;
         var currentWord = "X";
@@ -280,6 +285,10 @@
             document.getElementById("score-player-1").innerHTML = scorePlayer1
             document.getElementById("score-player-2").innerHTML = scorePlayer2
 
+            //display which player has which canvas
+            document.getElementById("player1-display").innerHTML = p1
+            document.getElementById("player2-display").innerHTML = p2
+
             // starts the game logic
             timer = setInterval(countdown, 1000);
         }
@@ -297,9 +306,9 @@
                 // get the winner
                 let winner;
                 if (scorePlayer1 > scorePlayer2) {
-                    winner = "player1"
+                    winner = p1
                 } else if (scorePlayer2 > scorePlayer1) {
-                    winner = "player2"
+                    winner = p2
                 }
 
                 // redirects to winning page

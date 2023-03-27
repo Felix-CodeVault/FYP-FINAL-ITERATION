@@ -198,7 +198,8 @@ def message(data):
 
     content = {
         "name": session.get("name"),
-        "message": data["data"]
+        "message": data["data"],
+        "player_num": 0
     }
     send(content, to=room)
     rooms[room]["messages"].append(content)
@@ -217,9 +218,13 @@ def connect(auth):
 
     # join room
     join_room(room)
-    send({"name": name, "message": "has entered the room"}, to=room)
+    # send({"name": name, "message": "has entered the room"}, to=room)
     rooms[room]["members"] += 1
-    print(f"{name} connected to room {room}")
+
+    # assigning player number
+    send({"name": name, "message": "has entered the room", "player_num": rooms[room]["members"]}, to=room)
+
+    print(f"{name} - {rooms[room]['members']} - connected to room {room}")
 
 
 @socketio.on("disconnect")
@@ -232,13 +237,14 @@ def disconnect():
 
     if room in rooms:
         rooms[room]["members"] -= 1
+        # sends the leave message
+        send({"name": name, "message": "has left the room"}, to=room)
         # waiting before checking if room can be deleted
         # this ensures ample time to reconnect on page reload
         time.sleep(5)
         if rooms[room]["members"] <= 0:
             del rooms[room]
 
-    send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} disconnected from room {room}")
 
 

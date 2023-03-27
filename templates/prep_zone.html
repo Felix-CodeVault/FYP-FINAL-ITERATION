@@ -32,6 +32,10 @@
     </form>
 
     <script type="text/javascript">
+        // player 1 and 2
+        var player1;
+        var player2;
+
         var socketio = io();
 
         const messages = document.getElementById("messages");
@@ -55,6 +59,16 @@
         };
 
         socketio.on("message", (data) => {
+            //setting player 1 and 2
+            var player_num = data.player_num
+            if (player_num === 1) {
+                //clear and set
+                localStorage.removeItem("player1")
+                localStorage.setItem("player1", data.name)
+            } else if (player_num === 2) {
+                localStorage.removeItem("player2")
+                localStorage.setItem("player2", data.name)
+            }
             createMessage(data.name, data.message)
         })
 
@@ -74,6 +88,7 @@
 
     <script type="text/javascript">
         socketio.on("redirect_play", function (url) {
+            // setting player 1 and 2
             window.location.href = url;
         })
         var playBtn = document.getElementById("play-btn");
