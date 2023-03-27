@@ -1,8 +1,8 @@
 {% extends "base.html" %} {% block content %}
 <form method="post" class="white-container">
-    <h1>Welcome, {{name}}!</h1>
+    <h1 style="font-weight: bolder">Welcome, {{name}}!</h1>
     <div>
-        <label>Join a Game</label>
+        <label style="font-size: large; font-weight: bolder">Join a Game</label>
         <br>
         <input type="text"
                placeholder="Game Code"
@@ -11,18 +11,18 @@
                value="{{code}}"
         >
         <br>
-        <button type="submit" name="join">Join</button>
+        <button class="button" type="submit" name="join">Join</button>
     </div>
     {% if error %}
     <ul>
-        <li>{{error}}</li>
+        <li style="color: crimson">{{error}}</li>
     </ul>
     {% endif %}
 
     <div>
-        <label>Create a Game</label>
+        <label style="font-size: large">Create a Game</label>
         <br>
-        <button type="submit" name="create">Create a Game</button>
+        <button class="button" type="submit" name="create">Create</button>
     </div>
 </form>
 

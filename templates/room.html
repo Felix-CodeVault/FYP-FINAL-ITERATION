@@ -10,18 +10,18 @@
         <br>
 
         <div class="column">
-            <div class="points-section" id="score-player-1"></div>
+            <div class="points-section" id="score-player-1" style="background-color:  #ff1414"></div>
             <br>
             <div class="canvas">
                 <canvas id="canvas" width="400" height="400"></canvas>
             </div>
             <br>
-            <div class="name-clear" id="name-clear">
-                <button type="button" onclick="clearCanvas1()">Clear</button>
-                <p id="player1-display" style="color: crimson"></p>
+            <div class="name-clear" id="name-clear" style="background-color: #ff1414">
+                <button class="button" style="padding-left: 50px; padding-right: 50px; font-weight: bold" type="button" onclick="clearCanvas1()">Clear</button>
+                <h3 id="player1-display"></h3>
             </div>
             <br>
-            <div class="guess-word" id="guess-word-1"></div>
+            <div class="guess-word" id="guess-word-1" style="background-color:  #ff1414"></div>
         </div>
 
         <div class="column">
@@ -32,7 +32,7 @@
                 <div class="messages" id="messages"></div>
                 <div class="inputs">
                     <input type="text" rows="3" placeholder="Message" id="message">
-                    <button type="button" name="send" id="send-btn" onclick="sendMessage()">Send</button>
+                    <button class="button" type="button" name="send" id="send-btn" onclick="sendMessage()">Send</button>
                     <script>
                         var input = document.getElementById("message");
                         input.addEventListener("keypress", function (event) {
@@ -48,18 +48,18 @@
         </div>
 
         <div class="column">
-            <div class="points-section" id="score-player-2"></div>
+            <div class="points-section" id="score-player-2" style="background-color: dodgerblue"></div>
             <br>
             <div class="canvas">
                 <canvas id="canvas-player-2" width="400" height="400"></canvas>
             </div>
             <br>
-            <div class="name-clear" id="name-clear">
-                <button type="button" onclick="clearCanvas2()">Clear</button>
-                <p id="player2-display" style="color: crimson"></p>
+            <div class="name-clear" id="name-clear" style="background-color: dodgerblue">
+                <button class="button" style="padding-left: 50px; padding-right: 50px; font-weight: bold" type="button" onclick="clearCanvas2()">Clear</button>
+                <h3 id="player2-display"></h3>
             </div>
             <br>
-            <div class="guess-word" id="guess-word-2"></div>
+            <div class="guess-word" id="guess-word-2" style="background-color: dodgerblue"></div>
         </div>
     </div>
 
@@ -312,7 +312,7 @@
                 }
 
                 // redirects to winning page
-                window.location.href = "http://localhost:5000/winner_screen?winnerValue=" + encodeURI(winner)
+                //window.location.href = "http://localhost:5000/winner_screen?winnerValue=" + encodeURI(winner)
                 // stops code going further
             }
 
@@ -365,8 +365,8 @@
             document.getElementById("timer-box").innerHTML = timeRemaining.toString();
 
             // show the guess
-            document.getElementById("guess-word-1").innerHTML = guessPlayer1
-            document.getElementById("guess-word-2").innerHTML = guessPlayer2
+            document.getElementById("guess-word-1").innerHTML = guessPlayer1.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+            document.getElementById("guess-word-2").innerHTML = guessPlayer2.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
 
             // checks players drawing
             if (guessPlayer1 === currentWord && guess1_Once === false) {

@@ -2,15 +2,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: "Goudy Old Style";
+    border: black 1px solid;
+
 }
 
+input[type=text] {
+    border: black 3px solid;
+}
+
+.element::-webkit-input-placeholder {
+    font-family: "Gougy Old Style";
+    font-weight: bold;
+}
+
+
+
 .white-container {
+    font-weight: bold;
     background-color: white;
     padding: 20px;
     width: 300px;
     margin: 0 auto;
     text-align: center;
-    border: 1px solid #000000;
+    border: 3px solid #000000;
     border-radius: 5px;
 
     display: flex;
@@ -21,12 +36,11 @@
 }
 
 .button {
-    background-color: #0041b9;
-    color: white;
-    padding: 10px 20px;
+    background-color: #679dff;
+    color: black;
     border-radius: 5px;
-    border: none;
-    font-size: 16px;
+    border: 3px black solid;
+    padding-block: 5px;
     cursor: pointer;
 }
 
@@ -39,18 +53,22 @@
 }
 
 .join {
+    font-weight: bold;
+
     display: flex;
     flex-direction: row;
     width: 100%;
 }
 
 .create-btn {
+    font-weight: bold;
+
     width: 100%;
 }
 
 .message-box {
     border-color: black;
-    border-width: 2px;
+    border-width: 3px;
     border-style: solid;
     border-radius: 10px;
     background-color: whitesmoke;
@@ -96,7 +114,7 @@ h2 {
 }
 
 .canvas {
-    border: black;
+    border: black 5px solid;
     background-color: white;
 }
 
@@ -111,34 +129,43 @@ h2 {
 }
 
 .wordToDraw {
-    background-color: white;
+    font-weight: bold;
+
+    background-color: #a9a9a9;
     font-size: 35px;
     text-align: center;
+    border: black 5px solid;
 }
 
 .points-section {
+    font-weight: bold;
+
     background-color: white;
     font-size: 25px;
     padding: 5px;
     text-align: center;
-    border: black 3px;
+    border: black 3px solid;
 }
 
 .guess-word {
+    font-weight: bold;
     background-color: white;
     font-size: 20px;
-    padding: 5px;
+    padding: 10px;
     text-align: center;
-    border: black 3px;
+    border: black 3px solid;
 
 }
 
 .timer-box {
-    background-color: white;
+    font-weight: bold;
+
+    background-color: grey;
     font-size: 30px;
     text-align: center;
     padding: 10px;
     align-content: center;
+    border: black 3px solid;
 }
 
 @keyframes bang {
@@ -180,12 +207,12 @@ i {
 .name-clear {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
-}
-
-.name-clear.reverse {
-    flex-direction: row-reverse;
+    background-color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: black 3px solid;
 }
 
 

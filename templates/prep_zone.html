@@ -3,7 +3,7 @@
     <form method="post">
         <div class="white-container">
             <h2>{{ code }}</h2>
-            <button name="play-btn" id="play-btn" type="button" onclick="sendToGame()">Play</button>
+            <button class="button" name="play-btn" id="play-btn" type="button" onclick="sendToGame()">Play</button>
             <p style="text-align: center" id="error"></p>
 
         </div>
@@ -15,7 +15,7 @@
                 <div class="messages" id="messages"></div>
                 <div class="inputs">
                     <input type="text" rows="3" placeholder="Message" id="message">
-                    <button type="button" name="send" id="send-btn" onclick="sendMessage()">Send</button>
+                    <button class="button" type="button" name="send" id="send-btn" onclick="sendMessage()">Send</button>
                     <script>
                         var input = document.getElementById("message");
                         input.addEventListener("keypress", function (event) {
