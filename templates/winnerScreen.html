@@ -1,5 +1,26 @@
 {% extends "base.html" %}
+{% block head %}
+    <script src="{{ url_for('static', filename='confetti.js') }}"></script>
+{% endblock %}
+
 {% block content %}
-<h1>{{ winner }}</h1>
+
+    <div class="winner" id="winner-div">
+        <h1>
+            Congratulations
+            <br>
+            {{ winner }}
+            <br>
+            You are the Winner!!!
+        </h1>
+    </div>
+
+    <script type="text/javascript">
+        let partyHornSound = new Audio("static/party-horn.mp3");
+        partyHornSound.play();
+        setTimeout(function() {
+            startConfetti();
+        }, (1000))
+    </script>
 
 {% endblock %}

@@ -4,12 +4,8 @@
         <div class="white-container">
             <h2>{{ code }}</h2>
             <button name="play-btn" id="play-btn" type="button" onclick="sendToGame()">Play</button>
-            <br>
-            {% if error %}
-                <ul>
-                    <li>{{ error }}</li>
-                </ul>
-            {% endif %}
+            <p style="text-align: center" id="error"></p>
+
         </div>
 
 
@@ -36,6 +32,10 @@
     </form>
 
     <script type="text/javascript">
+        // player 1 and 2
+        var player1;
+        var player2;
+
         var socketio = io();
 
         const messages = document.getElementById("messages");
@@ -59,6 +59,16 @@
         };
 
         socketio.on("message", (data) => {
+            //setting player 1 and 2
+            var player_num = data.player_num
+            if (player_num === 1) {
+                //clear and set
+                localStorage.removeItem("player1")
+                localStorage.setItem("player1", data.name)
+            } else if (player_num === 2) {
+                localStorage.removeItem("player2")
+                localStorage.setItem("player2", data.name)
+            }
             createMessage(data.name, data.message)
         })
 
@@ -77,9 +87,32 @@
     </script>
 
     <script type="text/javascript">
-        function sendToGame(){
-            window.location.href = "{{ url_for('room') }}"
-        }
+        socketio.on("redirect_play", function (url) {
+            // setting player 1 and 2
+            window.location.href = url;
+        })
+        var playBtn = document.getElementById("play-btn");
+        playBtn.addEventListener("click", function () {
+            socketio.emit("play_button_pressed")
+        })
+
+        socketio.on("error_message", function (error) {
+            var errorElement = document.getElementById("error")
+            errorElement.textContent = error
+        })
+
+        var word_list_global = ["airplane", "alarm_clock", "anvil", "apple", "axe", "baseball", "baseball_bat", "basketball", "bed",
+            "bench", "bicycle", "bird", "book", "bread", "bridge", "broom", "butterfly", "camera", "candle", "car",
+            "cat", "cell_phone", "chair", "circle", "clock", "cloud", "cookie", "cup", "diving_board", "donut",
+            "door", "drums", "dumbbell", "envelope", "eye", "eyeglasses", "face", "flower", "frying_pan", "grapes",
+            "hammer", "hat", "headphones", "helmet", "hot_dog", "ice_cream", "key", "knife", "ladder", "laptop",
+            "light_bulb", "lightning", "lollipop", "microphone", "moon", "mountain", "moustache", "mushroom",
+            "pants", "paper_clip", "pencil", "pillow", "pizza", "power_outlet", "radio", "rainbow", "rifle", "saw",
+            "scissors", "screwdriver", "shorts", "shovel", "smiley_face", "snake", "sock", "spider", "spoon",
+            "square", "star", "stop_sign", "suitcase", "sun", "sword", "syringe", "t-shirt", "table",
+            "tennis_racquet", "tent", "tooth", "traffic_light", "tree", "triangle", "umbrella", "wheel",
+            "wristwatch"]
+
     </script>
 
 {% endblock %}

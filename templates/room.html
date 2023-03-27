@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block head %}
+{% endblock %}
+
 {% block content %}
 
 
@@ -11,6 +14,11 @@
             <br>
             <div class="canvas">
                 <canvas id="canvas" width="400" height="400"></canvas>
+            </div>
+            <br>
+            <div class="name-clear" id="name-clear">
+                <button type="button" onclick="clearCanvas1()">Clear</button>
+                <p id="player1-display" style="color: crimson"></p>
             </div>
             <br>
             <div class="guess-word" id="guess-word-1"></div>
@@ -46,10 +54,14 @@
                 <canvas id="canvas-player-2" width="400" height="400"></canvas>
             </div>
             <br>
+            <div class="name-clear" id="name-clear">
+                <button type="button" onclick="clearCanvas2()">Clear</button>
+                <p id="player2-display" style="color: crimson"></p>
+            </div>
+            <br>
             <div class="guess-word" id="guess-word-2"></div>
         </div>
     </div>
-
 
     <script type="text/javascript">
         var playerCount = 0;
@@ -207,15 +219,18 @@
     </script>
 
     <script type="text/javascript">
+        // assigning player 1 and 2
+        var p1 = localStorage.getItem("player1")
+        var p2 = localStorage.getItem("player2")
         // data for running the game
         var gameStarted = false;
-        var currentWord;
+        var currentWord = "X";
+        var words = JSON.parse("{{ word_list }}".replace(/&#39;/g, '"'))
         var timer;
         var timeRemaining;
-        var words = ["airplane", "alarm_clock", "anvil", "apple", "axe", "baseball", "baseball_bat", "basketball", "bed", "bench", "bicycle", "bird", "book", "bread", "bridge", "broom", "butterfly", "camera", "candle", "car", "cat", "cell_phone", "chair", "circle", "clock", "cloud", "cookie", "cup", "diving_board", "donut", "door", "drums", "dumbbell", "envelope", "eye", "eyeglasses", "face", "flower", "frying_pan", "grapes", "hammer", "hat", "headphones", "helmet", "hot_dog", "ice_cream", "key", "knife", "ladder", "laptop", "light_bulb", "lightning", "lollipop", "microphone", "moon", "mountain", "moustache", "mushroom", "pants", "paper_clip", "pencil", "pillow", "pizza", "power_outlet", "radio", "rainbow", "rifle", "saw", "scissors", "screwdriver", "shorts", "shovel", "smiley_face", "snake", "sock", "spider", "spoon", "square", "star", "stop_sign", "suitcase", "sun", "sword", "syringe", "t-shirt", "table", "tennis_racquet", "tent", "tooth", "traffic_light", "tree", "triangle", "umbrella", "wheel", "wristwatch"]
         var timeLimit = 60;
         var roundNum = 0;
-        var amountOfRounds = 0;
+        var amountOfRounds = words.length;
 
         var scorePlayer1 = 0;
         var guessPlayer1 = "Guessing...";
@@ -229,6 +244,10 @@
         var guess1_Once = false;
         var guess2_Once = false;
 
+        // sound effects
+        let correctGuessSound = new Audio("static/correct-choice.mp3")
+        let nextLevelSound = new Audio("static/new-level.mp3")
+
         // getting the guesses
         socketio.on("guess-player-1", (g1) => {
             guessPlayer1 = g1.toString();
@@ -237,15 +256,25 @@
             guessPlayer2 = g2.toString();
         })
 
+        // updating the score
+        socketio.on("score_update1", (s1) => {
+            document.getElementById("score-player-1").innerHTML = s1;
+        })
+        socketio.on("score_update2", (s2) => {
+            document.getElementById("score-player-2").innerHTML = s2;
+        })
+
         // start condition
         if (gameStarted === false) {
             gameStarted = true;
             startGame();
         }
 
-        // game starts, random word is picked, and timer is started
+
+        // game starts word is picked, and timer is started
         function startGame() {
-            currentWord = words[Math.floor(Math.random() * words.length)];
+            currentWord = words[roundNum];
+
             console.log(currentWord)
 
             // display word to players
@@ -256,11 +285,20 @@
             document.getElementById("score-player-1").innerHTML = scorePlayer1
             document.getElementById("score-player-2").innerHTML = scorePlayer2
 
+            //display which player has which canvas
+            document.getElementById("player1-display").innerHTML = p1
+            document.getElementById("player2-display").innerHTML = p2
+
             // starts the game logic
             timer = setInterval(countdown, 1000);
         }
 
         function nextRound() {
+            //cancel timer
+            clearInterval(timer);
+
+            roundNum++;
+
             // declare winner after certain rounds
             if (roundNum >= amountOfRounds) {
                 //cancel timer
@@ -268,27 +306,31 @@
                 // get the winner
                 let winner;
                 if (scorePlayer1 > scorePlayer2) {
-                    winner = "player1"
+                    winner = p1
                 } else if (scorePlayer2 > scorePlayer1) {
-                    winner = "player2"
+                    winner = p2
                 }
 
-                // redirect to
+                // redirects to winning page
                 window.location.href = "http://localhost:5000/winner_screen?winnerValue=" + encodeURI(winner)
-
+                // stops code going further
             }
+
 
             // rest guess correct
             guess1_Once = false;
             guess2_Once = false;
-            //cancel timer
-            clearInterval(timer);
-            //clears canvases
 
             setTimeout(function () {
+
+
+                // rest guess correct
+                guess1_Once = false;
+                guess2_Once = false;
+                // clear canvas
                 clearCanvas(3)
                 // select new word
-                currentWord = words[Math.floor(Math.random() * words.length)];
+                currentWord = words[roundNum];
                 document.getElementById("wordToDraw").innerHTML = (currentWord.charAt(0).toUpperCase() + currentWord.slice(1)).replace(/_/g, " ");
                 // reset timer
                 document.getElementById("timer-box").innerHTML = timeLimit;
@@ -296,9 +338,12 @@
                 // reset guesses
                 document.getElementById("guess-word-1").innerHTML = "Guessing..."
                 document.getElementById("guess-word-2").innerHTML = "Guessing..."
-                roundNum++;
+
+
             }, (3 * 1000));
 
+            // plays sound effect
+            nextLevelSound.play()
 
             //starts game logic again after 3 seconds
             setTimeout(function () {
@@ -307,7 +352,6 @@
         }
 
 
-        // when timer reaches zero
         function countdown() {
             // decrement the timer
             timeRemaining = parseInt(document.getElementById("timer-box").innerHTML);
@@ -327,6 +371,7 @@
             // checks players drawing
             if (guessPlayer1 === currentWord && guess1_Once === false) {
                 guess1_Once = true;
+                correctGuessSound.play()
                 // calc and award points
                 pointsPlayer1 = parseInt(timeRemaining) * 13;
                 updateScore(1, pointsPlayer1)
@@ -334,6 +379,7 @@
 
             if (guessPlayer2 === currentWord && guess2_Once === false) {
                 guess2_Once = true;
+                correctGuessSound.play()
                 // calc and award points
                 pointsPlayer2 = parseInt(timeRemaining) * 13;
                 updateScore(2, pointsPlayer2)
@@ -341,12 +387,14 @@
 
             if (guessPlayer1 === currentWord && guessPlayer2 === currentWord) {
                 //move to next round
+                clearInterval(timer)
                 nextRound()
             }
 
             // check if times up
             if (timeRemaining === 0) {
                 // reaches here if neither players has drawn correctly
+                clearInterval(timer)
                 nextRound()
             }
 
@@ -354,12 +402,14 @@
             function updateScore(player, points) {
                 if (player === 1) {
                     scorePlayer1 += points;
+                    socketio.emit("broadcast_score1", scorePlayer1);
                 }
                 if (player === 2) {
                     scorePlayer2 += points;
+                    socketio.emit("broadcast_score2", scorePlayer2);
                 }
-                document.getElementById("score-player-1").innerHTML = scorePlayer1.toString()
-                document.getElementById("score-player-2").innerHTML = scorePlayer2.toString()
+
+
             }
         }
 
@@ -373,6 +423,28 @@
             if (c === 2 || c === 3) {
                 ctx_player_2.clearRect(0, 0, 400, 400)
             }
+        }
+
+    </script>
+
+    <script type="text/javascript">
+        // clearing canvases via sockets and button
+        socketio.on("clear1", () => {
+            clearCanvas(1)
+        })
+
+        function clearCanvas1() {
+            clearCanvas(1)
+            socketio.emit("clearCanvas1")
+        }
+
+        socketio.on("clear2", () => {
+            clearCanvas(2)
+        })
+
+        function clearCanvas2() {
+            clearCanvas(2)
+            socketio.emit("clearCanvas2")
         }
     </script>
 
